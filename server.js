@@ -32,7 +32,7 @@ app.post('/api/chat', async (req, res) => {
         'X-Title': 'Angeles Animal Care Hospital',
       },
       body: JSON.stringify({
-        model: 'google/gemma-3-4b-it:free',
+        model: 'openrouter/auto',
         messages: [
           {
             role: 'system',

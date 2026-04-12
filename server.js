@@ -32,7 +32,7 @@ app.post('/api/chat', async (req, res) => {
         'X-Title': 'Angeles Animal Care Hospital',
       },
       body: JSON.stringify({
-        model: 'mistralai/mistral-7b-instruct:free',
+        model: 'google/gemma-3-4b-it:free',
         messages: [
           {
             role: 'system',
@@ -47,7 +47,6 @@ Be concise, clear, and always recommend consulting a vet for serious concerns.`
 
     const data = await response.json();
 
-    // Log full response for debugging
     console.log('OpenRouter response:', JSON.stringify(data, null, 2));
 
     if (!response.ok) {

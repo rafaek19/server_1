@@ -18,6 +18,10 @@ app.post('/api/chat', async (req, res) => {
     return res.status(400).json({ error: 'Question is required' });
   }
 
+  if (!process.env.OPENROUTER_API_KEY) {
+    return res.status(500).json({ error: 'API key not configured' });
+  }
+
   try {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -28,7 +32,7 @@ app.post('/api/chat', async (req, res) => {
         'X-Title': 'Angeles Animal Care Hospital',
       },
       body: JSON.stringify({
-        model: 'meta-llama/llama-3-8b-instruct:free',
+        model: 'mistralai/mistral-7b-instruct:free',
         messages: [
           {
             role: 'system',
@@ -43,14 +47,23 @@ Be concise, clear, and always recommend consulting a vet for serious concerns.`
 
     const data = await response.json();
 
+    // Log full response for debugging
+    console.log('OpenRouter response:', JSON.stringify(data, null, 2));
+
     if (!response.ok) {
-      console.error('API error response:', JSON.stringify(data, null, 2));
+      console.error('OpenRouter error:', JSON.stringify(data, null, 2));
       return res.status(response.status).json({
         error: data?.error?.message || JSON.stringify(data?.error) || 'API error'
       });
     }
 
-    const text = data.choices?.[0]?.message?.content || 'Sorry, I could not get a response.';
+    const text = data.choices?.[0]?.message?.content;
+
+    if (!text) {
+      console.error('Empty response from OpenRouter:', JSON.stringify(data, null, 2));
+      return res.status(500).json({ error: 'No response from AI model' });
+    }
+
     res.json({ content: [{ text }] });
 
   } catch (err) {
